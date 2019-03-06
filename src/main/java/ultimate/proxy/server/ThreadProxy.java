@@ -1,8 +1,11 @@
 package ultimate.proxy.server;
 
+import rawhttp.core.RawHttp;
+import rawhttp.core.RawHttpRequest;
+import rawhttp.core.RawHttpResponse;
+
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class ThreadProxy extends Thread {
     private Socket client;
@@ -36,7 +39,7 @@ public class ThreadProxy extends Thread {
             outToServer.close();
             client.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Request -> " + e.getMessage());
         }
     }
 
@@ -54,33 +57,45 @@ public class ThreadProxy extends Thread {
     private void sendRequestToServer(InputStream inFromClient, OutputStream outToServer) {
         new Thread(() -> {
             try {
-                String request = sendData(inFromClient, outToServer);
+                String request = sendRequest(inFromClient, outToServer);
                 System.out.println("Request received : \n" + request);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Request -> " + e.getMessage());
             }
         }).start();
     }
 
     private void sendResponseToClient(OutputStream outToClient, InputStream inFromServer) {
         try {
-            String response = sendData(inFromServer, outToClient);
+            String response = sendResponse(inFromServer, outToClient);
             System.out.println("Response received : \n" + response);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Response -> " + e.getMessage());
         }
     }
 
-    private String sendData(InputStream inStream, OutputStream outStream) throws IOException {
+    private String sendRequest(InputStream inStream, OutputStream outStream) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        final byte[] request = new byte[1024];
 
-        int bytes_read;
-        while ((bytes_read = inStream.read(request)) != -1) {
-            stringBuilder.append(new String(Arrays.copyOf(request, bytes_read)));
-            outStream.write(request, 0, bytes_read);
-            outStream.flush();
-        }
+        RawHttpRequest rawHttpRequest = new RawHttp().parseRequest(inStream);
+
+        stringBuilder.append(rawHttpRequest.getMethod());
+        stringBuilder.append(rawHttpRequest.getUri().getPath());
+        stringBuilder.append(rawHttpRequest.getUri().getPort());
+
+        rawHttpRequest.writeTo(outStream);
+
+        return stringBuilder.toString();
+    }
+
+    private String sendResponse(InputStream inStream, OutputStream outStream) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        RawHttpResponse rawHttpResponse = new RawHttp().parseResponse(inStream);
+
+        stringBuilder.append(rawHttpResponse.getStatusCode());
+
+        rawHttpResponse.writeTo(outStream);
 
         return stringBuilder.toString();
     }
