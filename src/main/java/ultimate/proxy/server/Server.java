@@ -13,7 +13,7 @@ public class Server {
                 System.out.println("Starting proxy for " + connection.getDestinationHost() + ":" + connection.getDestinationPort() + " on port " + connection.getOpenPort());
                 ServerSocket server = new ServerSocket(connection.getOpenPort());
                 while (true) {
-                    new ThreadProxy(server.accept(), connection.getDestinationHost(), connection.getDestinationPort());
+                    new ThreadProxy(server.accept(), connection);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());

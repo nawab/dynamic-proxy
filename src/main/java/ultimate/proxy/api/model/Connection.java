@@ -5,6 +5,16 @@ public class Connection {
     int destinationPort;
     String destinationHost;
 
+    String protocol;
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public boolean isSecure() {
+        return "https".equalsIgnoreCase(protocol);
+    }
+
     public int getOpenPort() {
         return openPort;
     }

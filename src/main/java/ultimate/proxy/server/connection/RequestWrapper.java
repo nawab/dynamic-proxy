@@ -20,18 +20,6 @@ public class RequestWrapper {
         this.inStream = inStream;
     }
 
-    public String getStartLine() {
-        return startLine;
-    }
-
-    public RawHttpHeaders getHeaders() {
-        return headers;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
     public RequestWrapper invoke() throws IOException {
         RawHttpRequest rawHttpRequest = new RawHttp().parseRequest(inStream);
 
@@ -64,10 +52,10 @@ public class RequestWrapper {
     }
 
     byte[] getBytes() {
-        String startLine = getStartLine();
-        RawHttpHeaders headers = getHeaders();
-        String body = getBody();
+        return (this.startLine + SEPARATER + this.headers + SEPARATER + this.body).getBytes();
+    }
 
-        return (startLine + SEPARATER + headers + SEPARATER + body).getBytes();
+    public void setHost(String serverUrl, int serverPort) {
+        headers = headers.and(RawHttpHeaders.newBuilder().with("host", serverUrl + ":" + serverPort).build());
     }
 }

@@ -1,5 +1,6 @@
 package ultimate.proxy.server;
 
+import ultimate.proxy.api.model.Connection;
 import ultimate.proxy.server.connection.HttpConnection;
 
 import java.io.IOException;
@@ -8,13 +9,12 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class ThreadProxy extends Thread {
+    private final Connection connection;
     private Socket client;
-    private final String SERVER_URL;
-    private final int SERVER_PORT;
 
-    ThreadProxy(Socket client, String ServerUrl, int ServerPort) {
-        this.SERVER_URL = ServerUrl;
-        this.SERVER_PORT = ServerPort;
+
+    ThreadProxy(Socket client, Connection connection) {
+        this.connection = connection;
         this.client = client;
         this.start();
     }
@@ -25,7 +25,7 @@ public class ThreadProxy extends Thread {
             final InputStream inFromClient = client.getInputStream();
             final OutputStream outToClient = client.getOutputStream();
 
-            new HttpConnection(SERVER_PORT, SERVER_URL).serve(inFromClient, outToClient);
+            new HttpConnection(connection).serve(inFromClient, outToClient);
 
             inFromClient.close();
             outToClient.close();

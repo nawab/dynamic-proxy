@@ -20,18 +20,6 @@ public class ResponseWrapper {
         this.inStream = inStream;
     }
 
-    public String getStartLine() {
-        return startLine;
-    }
-
-    public RawHttpHeaders getHeaders() {
-        return headers;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
     public ResponseWrapper invoke() throws IOException {
         RawHttpResponse rawHttpResponse = new RawHttp().parseResponse(inStream);
 
@@ -63,10 +51,6 @@ public class ResponseWrapper {
     }
 
     byte[] getBytes() {
-        String startLine = getStartLine();
-        RawHttpHeaders headers = getHeaders();
-        String body = getBody();
-
-        return (startLine + SEPARATER + headers + SEPARATER + body).getBytes();
+        return (this.startLine + SEPARATER + this.headers + SEPARATER + this.body).getBytes();
     }
 }
