@@ -1,8 +1,12 @@
 package ultimate.proxy.server.connection;
 
 import ultimate.proxy.api.model.Connection;
+import ultimate.proxy.api.model.RequestModel;
+import ultimate.proxy.api.model.ResponseModel;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,11 +73,11 @@ public class HttpConnection {
         new Thread(() -> {
             try {
                 OutputStream outToServer = server.getOutputStream();
-                RequestWrapper requestWrapper = new RequestWrapper(inFromClient).invoke();
-                requestWrapper.setHost(serverUrl, serverPort);
-                outToServer.write(requestWrapper.getBytes());
+                RequestModel requestModel = HttpMessageParser.createRequestModel(inFromClient);
+                requestModel.setHost(serverUrl, serverPort);
+                requestModel.writeTo(outToServer);
                 System.out.println("******************************");
-                System.out.println("\n*** Request received : ***\n" + requestWrapper.getString());
+                System.out.println("\n*** Request received : ***\n" + requestModel.toString());
             } catch (IOException e) {
                 System.out.println("Request -> " + e.getMessage());
             }
@@ -83,9 +87,9 @@ public class HttpConnection {
     private void sendResponseToClient(OutputStream outToClient) {
         try {
             InputStream inFromServer = server.getInputStream();
-            ResponseWrapper responseWrapper = new ResponseWrapper(inFromServer).invoke();
-            outToClient.write(responseWrapper.getBytes());
-            System.out.println("\n*** Response received : ***\n" + responseWrapper.getString());
+            ResponseModel responseModel = HttpMessageParser.createResponseModel(inFromServer);
+            responseModel.writeTo(outToClient);
+            System.out.println("\n*** Response received : ***\n" + responseModel.toString());
             System.out.println("******************************");
         } catch (IOException e) {
             System.out.println("Response -> " + e.getMessage());
