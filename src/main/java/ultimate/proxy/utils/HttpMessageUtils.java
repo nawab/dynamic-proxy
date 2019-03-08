@@ -2,12 +2,10 @@ package ultimate.proxy.utils;
 
 import rawhttp.core.RawHttpHeaders;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipException;
 
 public class HttpMessageUtils {
 
@@ -15,13 +13,8 @@ public class HttpMessageUtils {
         try {
             StringBuilder stringBuilder = new StringBuilder();
 
-            InputStream bodyStream = isGZipped(headers)
-                    ? new GZIPInputStream(new ByteArrayInputStream(content))
-                    : new ByteArrayInputStream(content);
-
-            String line;
-
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bodyStream, Charset.defaultCharset()))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getInputStream(content, headers), Charset.defaultCharset()))) {
+                String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     stringBuilder.append(line);
                 }
@@ -29,6 +22,16 @@ public class HttpMessageUtils {
             return stringBuilder.toString();
         } catch (Exception ex) {
             return "<Unable to parse>";
+        }
+    }
+
+    private static InputStream getInputStream(byte[] content, RawHttpHeaders headers) throws IOException {
+        try {
+            return isGZipped(headers)
+                    ? new GZIPInputStream(new ByteArrayInputStream(content))
+                    : new ByteArrayInputStream(content);
+        } catch (ZipException e) {
+            return new ByteArrayInputStream(content);
         }
     }
 
