@@ -6,6 +6,7 @@ import ultimate.proxy.utils.HttpMessageUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class RequestModel {
     private RequestLine startLine;
@@ -34,8 +35,13 @@ public class RequestModel {
 
     public void writeTo(OutputStream outToServer) {
         try {
-            startLine.writeTo(outToServer);
+            byte[] bytes = startLine.toString().replace("%25", "%").getBytes(StandardCharsets.UTF_8);
+            outToServer.write(bytes);
+            outToServer.write('\r');
+            outToServer.write('\n');
+
             headers.writeTo(outToServer);
+
             outToServer.write(body);
         } catch (IOException e) {
             e.printStackTrace();
