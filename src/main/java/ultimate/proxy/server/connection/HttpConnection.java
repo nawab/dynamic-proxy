@@ -1,8 +1,9 @@
 package ultimate.proxy.server.connection;
 
 import ultimate.proxy.api.model.Connection;
-import ultimate.proxy.api.model.RequestModel;
-import ultimate.proxy.api.model.ResponseModel;
+import ultimate.proxy.domain.RequestModel;
+import ultimate.proxy.domain.ResponseModel;
+import ultimate.proxy.domain.Transaction;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -18,6 +19,8 @@ public class HttpConnection {
     private final int serverPort;
     private final String serverUrl;
     private final Socket server;
+    private RequestModel requestModel;
+    private ResponseModel responseModel;
 
     public HttpConnection(Connection connection) {
         this.serverPort = connection.getDestinationPort();
@@ -25,9 +28,13 @@ public class HttpConnection {
         server = connection.isSecure() ? establishSecureConnection() : establishConnection();
     }
 
-    public void serve(InputStream inFromClient, OutputStream outToClient) {
+    public Transaction serve(InputStream inFromClient, OutputStream outToClient) {
+        Transaction transaction = Transaction.start();
+
         sendRequestToServer(inFromClient);
         sendResponseToClient(outToClient);
+
+        return transaction.stop(requestModel, responseModel);
     }
 
     private Socket establishConnection() {
@@ -73,7 +80,7 @@ public class HttpConnection {
         new Thread(() -> {
             try {
                 OutputStream outToServer = server.getOutputStream();
-                RequestModel requestModel = HttpMessageParser.createRequestModel(inFromClient);
+                requestModel = HttpMessageParser.createRequestModel(inFromClient);
                 requestModel.setHost(serverUrl, serverPort);
                 requestModel.writeTo(outToServer);
                 System.out.println("******************************");
@@ -87,7 +94,7 @@ public class HttpConnection {
     private void sendResponseToClient(OutputStream outToClient) {
         try {
             InputStream inFromServer = server.getInputStream();
-            ResponseModel responseModel = HttpMessageParser.createResponseModel(inFromServer);
+            responseModel = HttpMessageParser.createResponseModel(inFromServer);
             responseModel.writeTo(outToClient);
             System.out.println("\n*** Response received : ***\n" + responseModel.toString());
             System.out.println("******************************");

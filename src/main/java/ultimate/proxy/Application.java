@@ -14,10 +14,10 @@ public class Application {
     }
 
     @Autowired
-    public void configureRoutes(RouteConfig routeConfig) {
+    public void configureRoutes(RouteConfig routeConfig, Route route) {
         routeConfig
                 .keySet()
-                .forEach(key -> Route.create(key, routeConfig.get(key)));
+                .forEach(key -> route.create(key, routeConfig.get(key)));
     }
 }
 

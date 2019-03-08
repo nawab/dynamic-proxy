@@ -1,4 +1,4 @@
-package ultimate.proxy.api.model;
+package ultimate.proxy.domain;
 
 import rawhttp.core.RawHttpHeaders;
 import rawhttp.core.RequestLine;

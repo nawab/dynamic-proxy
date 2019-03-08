@@ -2,8 +2,8 @@ package ultimate.proxy.server.connection;
 
 import rawhttp.core.*;
 import rawhttp.core.body.BodyReader;
-import ultimate.proxy.api.model.RequestModel;
-import ultimate.proxy.api.model.ResponseModel;
+import ultimate.proxy.domain.RequestModel;
+import ultimate.proxy.domain.ResponseModel;
 
 import java.io.IOException;
 import java.io.InputStream;
