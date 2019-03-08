@@ -1,1 +1,23 @@
-server.port : 7007
+server.port : 7000
+
+routes:
+  authentication:
+    open-port: 7012
+    destination-host: 'localhost'
+    destination-port: 9012
+    protocol: 'http'
+  authorisation:
+    open-port: 7013
+    destination-host: 'localhost'
+    destination-port: 9013
+    protocol: 'http'
+  configuration:
+    open-port: 7021
+    destination-host: 'localhost'
+    destination-port: 9021
+    protocol: 'http'
+  okta-preview:
+    open-port: 7101
+    destination-host: 'dev-482313.oktapreview.com'
+    destination-port: 443
+    protocol: 'https'

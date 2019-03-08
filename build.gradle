@@ -11,6 +11,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+}
+
 group 'ultimate'
 version '1.0-SNAPSHOT'
 

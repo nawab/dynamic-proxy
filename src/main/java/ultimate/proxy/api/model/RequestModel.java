@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class RequestModel {
+    private RequestLine startLine;
     private RawHttpHeaders headers;
     private byte[] body;
     private String bodyString;
-    private RequestLine startLine;
 
     public RequestModel(RequestLine startLine, RawHttpHeaders headers, byte[] body) {
         this.startLine = startLine;

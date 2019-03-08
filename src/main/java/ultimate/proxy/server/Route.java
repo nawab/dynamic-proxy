@@ -3,14 +3,17 @@ package ultimate.proxy.server;
 import ultimate.proxy.api.model.Connection;
 
 import java.net.ServerSocket;
+import java.text.MessageFormat;
 
-public class Server {
+import static java.text.MessageFormat.*;
 
-    public static void start(Connection connection) {
+public class Route {
+
+    public static void create(String serviceName, Connection connection) {
         new Thread(() -> {
             try {
-
-                System.out.println("Starting proxy for " + connection.getDestinationHost() + ":" + connection.getDestinationPort() + " on port " + connection.getOpenPort());
+                String pattern = "Starting %s proxy for %s [%s:%s] on port %s";
+                System.out.println(String.format(pattern, connection.getProtocol(), serviceName, connection.getDestinationHost(), connection.getDestinationPort(), connection.getOpenPort()));
                 ServerSocket server = new ServerSocket(connection.getOpenPort());
                 while (true) {
                     new ThreadProxy(server.accept(), connection);
